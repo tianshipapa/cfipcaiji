@@ -4,7 +4,9 @@ import re
 import os
 
 # 目标URL
-url = 'https://monitor.gacjie.cn/page/cloudflare/ipv4.html'
+url = 'https://monitor.gacjie.cn/page/cloudflare/ipv4.html',
+'https://ip.164746.xyz',
+'https://cf.090227.xyz',
 
 # 发送HTTP请求获取网页内容
 response = requests.get(url)
