@@ -1,10 +1,10 @@
 name: Update IP List
 
 on:
-  #schedule:
-    #- cron: '0 */3 * * *' # 每3小时运行一次
+  schedule:
+    - cron: '0 */3 * * *' # 每3小时运行一次
   workflow_dispatch: # 允许手动触发
-  #push: # 允许提交触发
+  push: # 允许提交触发
 
 jobs:
 
