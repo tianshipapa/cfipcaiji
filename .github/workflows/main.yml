@@ -24,6 +24,14 @@ jobs:
         pip install requests
         pip install beautifulsoup4
         
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        token: ${{ github.token }}
+        repository: ${{ github.repository }}
+        retain_days: 2
+        keep_minimum_runs: 6
+        
     - name: Run script
       run: python ${{ github.workspace }}/collect_ips.py
         
