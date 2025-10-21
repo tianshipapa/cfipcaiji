@@ -108,9 +108,11 @@ def download_driver(version: str) -> str:
     raise FileNotFoundError("chromedriver 未在解压包内找到")
 
 # ---------- 网络请求 ----------
+# ---------- 修正后的 _selenium_get ----------
 def _selenium_get(url: str) -> str:
     logging.info("启用 Undetected Chrome: %s", url)
-    driver_path = download_driver(get_chrome_major_version())
+    chrome_major = get_chrome_major_version()
+    driver_path = download_driver(chrome_major)
 
     options = uc.ChromeOptions()
     options.add_argument("--no-sandbox")
@@ -118,7 +120,12 @@ def _selenium_get(url: str) -> str:
     options.add_argument("--disable-gpu")
     options.add_argument("--headless=new")
 
-    driver = uc.Chrome(executable_path=driver_path, options=options)
+    # 关键：禁止 uc 自动下载，强制使用我们下载的 140 驱动
+    driver = uc.Chrome(
+        executable_path=driver_path,        # 旧接口仍可用
+        version_main=int(chrome_major),     # 锁住大版本
+        options=options
+    )
     try:
         driver.get(url)
         time.sleep(5)
