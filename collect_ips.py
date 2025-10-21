@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GitHub Actions 零报错版
+一键可用 / GitHub Actions 实测通过
 依赖：
     pip install -U requests beautifulsoup4 fake-useragent undetected-chromedriver
 """
@@ -68,23 +68,20 @@ def _sleep():
 def _sort_ip(ip: str):
     return tuple(map(int, ip.split(".")))
 
-# ---------- 新驱动下载逻辑 ----------
+# ---------- 修正版驱动下载 ----------
 def get_chrome_major_version() -> str:
-    cmd = "google-chrome --version"
-    raw = os.popen(cmd).read().strip()
-    # 示例：Google Chrome 140.0.7339.207
+    raw = os.popen("google-chrome --version").read().strip()
     return raw.split()[2].split(".")[0]
 
 def download_driver(version: str) -> str:
-    """Chrome for Testing 新接口"""
     zip_path = "/tmp/chromedriver.zip"
     extract_dir = "/tmp/chromedriver"
-    exec_path = os.path.join(extract_dir, "chromedriver")
+    # 先清空旧文件
+    os.makedirs(extract_dir, exist_ok=True)
+    for f in os.listdir(extract_dir):
+        os.remove(os.path.join(extract_dir, f))
 
-    if os.path.isfile(exec_path):
-        return exec_path
-
-    # 1. 获取对应大版本的驱动下载链接
+    # 1. 获取精确版本号
     api = f"https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_{version}"
     exact_version = requests.get(api, timeout=10).text.strip()
     download_url = f"https://storage.googleapis.com/chrome-for-testing-public/{exact_version}/linux64/chromedriver-linux64.zip"
@@ -99,15 +96,21 @@ def download_driver(version: str) -> str:
     # 2. 解压
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall(extract_dir)
-    # 3. 赋权
-    os.chmod(exec_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-    return exec_path
+
+    # 3. 递归找到真正的 chromedriver 可执行文件
+    for root, _, files in os.walk(extract_dir):
+        for file in files:
+            if file == "chromedriver":
+                exec_path = os.path.join(root, file)
+                os.chmod(exec_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+                return exec_path
+
+    raise FileNotFoundError("chromedriver 未在解压包内找到")
 
 # ---------- 网络请求 ----------
 def _selenium_get(url: str) -> str:
     logging.info("启用 Undetected Chrome: %s", url)
-    chrome_major = get_chrome_major_version()
-    driver_path = download_driver(chrome_major)
+    driver_path = download_driver(get_chrome_major_version())
 
     options = uc.ChromeOptions()
     options.add_argument("--no-sandbox")
@@ -118,7 +121,7 @@ def _selenium_get(url: str) -> str:
     driver = uc.Chrome(executable_path=driver_path, options=options)
     try:
         driver.get(url)
-        time.sleep(5)  # 过 5s 盾
+        time.sleep(5)
         return driver.page_source
     finally:
         driver.quit()
