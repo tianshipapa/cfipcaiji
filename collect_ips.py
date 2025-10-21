@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-GitHub Actions / Ubuntu 一键通过
+GitHub Actions 零报错版
 依赖：
     pip install -U requests beautifulsoup4 fake-useragent undetected-chromedriver
 """
@@ -68,20 +68,15 @@ def _sleep():
 def _sort_ip(ip: str):
     return tuple(map(int, ip.split(".")))
 
-# ---------- 驱动自动安装 ----------
+# ---------- 新驱动下载逻辑 ----------
 def get_chrome_major_version() -> str:
-    """返回系统 Chrome 主版本号，如 140"""
     cmd = "google-chrome --version"
-    try:
-        raw = os.popen(cmd).read().strip()
-        # 典型输出：Google Chrome 140.0.7339.207
-        return raw.split()[2].split(".")[0]
-    except Exception as e:
-        logging.error("获取 Chrome 版本失败: %s", e)
-        raise
+    raw = os.popen(cmd).read().strip()
+    # 示例：Google Chrome 140.0.7339.207
+    return raw.split()[2].split(".")[0]
 
 def download_driver(version: str) -> str:
-    """下载对应大版本 chromedriver，返回可执行文件路径"""
+    """Chrome for Testing 新接口"""
     zip_path = "/tmp/chromedriver.zip"
     extract_dir = "/tmp/chromedriver"
     exec_path = os.path.join(extract_dir, "chromedriver")
@@ -89,9 +84,10 @@ def download_driver(version: str) -> str:
     if os.path.isfile(exec_path):
         return exec_path
 
-    url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{version}"
-    exact_version = requests.get(url, timeout=10).text.strip()
-    download_url = f"https://chromedriver.storage.googleapis.com/{exact_version}/chromedriver_linux64.zip"
+    # 1. 获取对应大版本的驱动下载链接
+    api = f"https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_{version}"
+    exact_version = requests.get(api, timeout=10).text.strip()
+    download_url = f"https://storage.googleapis.com/chrome-for-testing-public/{exact_version}/linux64/chromedriver-linux64.zip"
 
     logging.info("下载 chromedriver %s -> %s", exact_version, download_url)
     with requests.get(download_url, stream=True, timeout=30) as r:
@@ -100,8 +96,10 @@ def download_driver(version: str) -> str:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
 
+    # 2. 解压
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall(extract_dir)
+    # 3. 赋权
     os.chmod(exec_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
     return exec_path
 
@@ -126,15 +124,10 @@ def _selenium_get(url: str) -> str:
         driver.quit()
 
 def requests_fallback(url: str) -> str:
-    """requests 重试 3 次，失败则走 Selenium"""
     for attempt in range(1, RETRY_TIMES + 1):
         try:
             logging.info("尝试[%d/%d] %s", attempt, RETRY_TIMES, url)
-            resp = requests.get(
-                url,
-                headers=_random_headers(),
-                timeout=TIMEOUT,
-            )
+            resp = requests.get(url, headers=_random_headers(), timeout=TIMEOUT)
             if resp.status_code == 200:
                 return resp.text
             if resp.status_code in (403, 503, 520, 521, 522, 525):
