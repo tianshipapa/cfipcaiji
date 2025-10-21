@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-高可用反爬版 CloudFlare IP 采集器
-运行前：pip install -U requests[socks] beautifulsoup4 fake-useragent undetected-chromedriver
+一键可用 / GitHub Actions 实测通过
+依赖安装：
+    pip install -U requests beautifulsoup4 fake-useragent undetected-chromedriver
 """
 
 import os
@@ -16,19 +17,23 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import undetected_chromedriver as uc
 
+# >>> 1. 驱动版本与 Runner 系统 Chrome 保持一致（140） <<<
+os.environ["UC_CHROMEDRIVER_VERSION"] = "140.0.7339.207"
+
+# >>> 2. 日志配置 <<<
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s - %(message)s",
     datefmt="%H:%M:%S",
 )
 
+# >>> 3. 全局常量 <<<
 IP_PATTERN = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b')
 OUTPUT_FILE = "ip.txt"
 RETRY_TIMES = 3
 TIMEOUT = 8
 RANDOM_JITTER = (1, 3)  # 随机暂停区间（秒）
 
-# 目标站点
 URLS = [
     'https://ip.164746.xyz', 
     'https://cf.090227.xyz', 
@@ -48,10 +53,10 @@ URLS = [
     'https://www.wetest.vip/page/cloudflare/address_v4.html'
 ]
 
-# 免费代理池（可换成付费 API）
+# 免费代理池 API（返回格式：{"data":[{"ip":"x.x.x.x","port":80},...]}）
 PROXY_POOL_URL = "http://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps"
 
-# ---------- 工具 ----------
+# >>> 4. 工具类 / 函数 <<<
 class ProxyRotator:
     """简易代理池，失败即弃用"""
     def __init__(self, proxy_api: str):
@@ -73,10 +78,8 @@ class ProxyRotator:
             self._fetch_proxies()
         return self.proxies.pop() if self.proxies else ""
 
-proxy_rotator = ProxyRotator(PROXY_POOL_URL)
-ua = UserAgent()
-
 def _random_headers() -> dict:
+    ua = UserAgent()
     return {
         "User-Agent": ua.random,
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -91,9 +94,10 @@ def _sleep():
 def _sort_ip(ip: str):
     return tuple(map(int, ip.split(".")))
 
-# ---------- 请求 ----------
+# >>> 5. 网络请求 <<<
 def requests_fallback(url: str) -> str:
-    """先走 requests + 代理重试，不行再换 Selenium"""
+    """先 requests + 代理重试，不行再换 Selenium"""
+    proxy_rotator = ProxyRotator(PROXY_POOL_URL)
     for attempt in range(1, RETRY_TIMES + 1):
         proxy = proxy_rotator.get()
         proxies = {"http": proxy, "https": proxy} if proxy else None
@@ -107,7 +111,7 @@ def requests_fallback(url: str) -> str:
             )
             if resp.status_code == 200:
                 return resp.text
-            # 触发 JS 挑战或 403/503 直接走浏览器
+            # 遇到 CF 盾或 403/503 直接走浏览器
             if resp.status_code in (403, 503, 520, 521, 522, 525):
                 raise RuntimeError("CF Shield")
         except Exception as e:
@@ -121,18 +125,17 @@ def _selenium_get(url: str) -> str:
     options = uc.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.headless = True
+    options.add_argument("--disable-gpu")
+    options.add_argument("--headless=new")  # Chrome 109+ 推荐
     driver = uc.Chrome(options=options)
     try:
         driver.get(url)
-        # 等待 5s 让 CF 5s 盾通过
-        time.sleep(5)
-        html = driver.page_source
-        return html
+        time.sleep(5)  # 过 5s 盾
+        return driver.page_source
     finally:
         driver.quit()
 
-# ---------- 主流程 ----------
+# >>> 6. 主流程 <<<
 def crawl() -> Set[str]:
     ips = set()
     for u in URLS:
@@ -155,6 +158,7 @@ def save(ips: Set[str]):
         f.write("\n".join(sorted_ips) + "\n")
     logging.info("已保存 %d 条 IP 到 %s", len(sorted_ips), OUTPUT_FILE)
 
+# >>> 7. 入口 <<<
 if __name__ == "__main__":
     if os.path.exists(OUTPUT_FILE):
         os.remove(OUTPUT_FILE)
