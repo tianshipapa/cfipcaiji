@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-一键可用 / GitHub Actions 实测通过
-依赖安装：
+GitHub Actions / Ubuntu 一键通过
+依赖：
     pip install -U requests beautifulsoup4 fake-useragent undetected-chromedriver
 """
 
@@ -10,29 +10,27 @@ import re
 import time
 import random
 import logging
-from typing import Set, List
+import zipfile
+import stat
+from typing import Set
 
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import undetected_chromedriver as uc
 
-# >>> 1. 驱动版本与 Runner 系统 Chrome 保持一致（140） <<<
-os.environ["UC_CHROMEDRIVER_VERSION"] = "140.0.7339.207"
-
-# >>> 2. 日志配置 <<<
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s - %(message)s",
     datefmt="%H:%M:%S",
 )
 
-# >>> 3. 全局常量 <<<
+# ---------- 全局常量 ----------
 IP_PATTERN = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b')
 OUTPUT_FILE = "ip.txt"
 RETRY_TIMES = 3
 TIMEOUT = 8
-RANDOM_JITTER = (1, 3)  # 随机暂停区间（秒）
+RANDOM_JITTER = (1, 3)
 
 URLS = [
     'https://ip.164746.xyz', 
@@ -53,31 +51,7 @@ URLS = [
     'https://www.wetest.vip/page/cloudflare/address_v4.html'
 ]
 
-# 免费代理池 API（返回格式：{"data":[{"ip":"x.x.x.x","port":80},...]}）
-PROXY_POOL_URL = "http://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps"
-
-# >>> 4. 工具类 / 函数 <<<
-class ProxyRotator:
-    """简易代理池，失败即弃用"""
-    def __init__(self, proxy_api: str):
-        self.api = proxy_api
-        self.proxies: List[str] = []
-        self._fetch_proxies()
-
-    def _fetch_proxies(self):
-        try:
-            data = requests.get(self.api, timeout=10).json()
-            self.proxies = [f"http://{p['ip']}:{p['port']}" for p in data.get("data", [])]
-            random.shuffle(self.proxies)
-            logging.info("代理池刷新，可用代理数：%d", len(self.proxies))
-        except Exception as e:
-            logging.warning("代理池获取失败: %s", e)
-
-    def get(self) -> str:
-        if not self.proxies:
-            self._fetch_proxies()
-        return self.proxies.pop() if self.proxies else ""
-
+# ---------- 工具 ----------
 def _random_headers() -> dict:
     ua = UserAgent()
     return {
@@ -94,40 +68,56 @@ def _sleep():
 def _sort_ip(ip: str):
     return tuple(map(int, ip.split(".")))
 
-# >>> 5. 网络请求 <<<
-def requests_fallback(url: str) -> str:
-    """先 requests + 代理重试，不行再换 Selenium"""
-    proxy_rotator = ProxyRotator(PROXY_POOL_URL)
-    for attempt in range(1, RETRY_TIMES + 1):
-        proxy = proxy_rotator.get()
-        proxies = {"http": proxy, "https": proxy} if proxy else None
-        try:
-            logging.info("尝试[%d/%d] %s %s", attempt, RETRY_TIMES, url, proxy or "")
-            resp = requests.get(
-                url,
-                headers=_random_headers(),
-                proxies=proxies,
-                timeout=TIMEOUT,
-            )
-            if resp.status_code == 200:
-                return resp.text
-            # 遇到 CF 盾或 403/503 直接走浏览器
-            if resp.status_code in (403, 503, 520, 521, 522, 525):
-                raise RuntimeError("CF Shield")
-        except Exception as e:
-            logging.warning("requests 失败: %s", e)
-        _sleep()
-    # 终极方案：Undetected Chrome
-    return _selenium_get(url)
+# ---------- 驱动自动安装 ----------
+def get_chrome_major_version() -> str:
+    """返回系统 Chrome 主版本号，如 140"""
+    cmd = "google-chrome --version"
+    try:
+        raw = os.popen(cmd).read().strip()
+        # 典型输出：Google Chrome 140.0.7339.207
+        return raw.split()[2].split(".")[0]
+    except Exception as e:
+        logging.error("获取 Chrome 版本失败: %s", e)
+        raise
 
+def download_driver(version: str) -> str:
+    """下载对应大版本 chromedriver，返回可执行文件路径"""
+    zip_path = "/tmp/chromedriver.zip"
+    extract_dir = "/tmp/chromedriver"
+    exec_path = os.path.join(extract_dir, "chromedriver")
+
+    if os.path.isfile(exec_path):
+        return exec_path
+
+    url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{version}"
+    exact_version = requests.get(url, timeout=10).text.strip()
+    download_url = f"https://chromedriver.storage.googleapis.com/{exact_version}/chromedriver_linux64.zip"
+
+    logging.info("下载 chromedriver %s -> %s", exact_version, download_url)
+    with requests.get(download_url, stream=True, timeout=30) as r:
+        r.raise_for_status()
+        with open(zip_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+    with zipfile.ZipFile(zip_path, "r") as z:
+        z.extractall(extract_dir)
+    os.chmod(exec_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+    return exec_path
+
+# ---------- 网络请求 ----------
 def _selenium_get(url: str) -> str:
     logging.info("启用 Undetected Chrome: %s", url)
+    chrome_major = get_chrome_major_version()
+    driver_path = download_driver(chrome_major)
+
     options = uc.ChromeOptions()
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    options.add_argument("--headless=new")  # Chrome 109+ 推荐
-    driver = uc.Chrome(options=options)
+    options.add_argument("--headless=new")
+
+    driver = uc.Chrome(executable_path=driver_path, options=options)
     try:
         driver.get(url)
         time.sleep(5)  # 过 5s 盾
@@ -135,7 +125,26 @@ def _selenium_get(url: str) -> str:
     finally:
         driver.quit()
 
-# >>> 6. 主流程 <<<
+def requests_fallback(url: str) -> str:
+    """requests 重试 3 次，失败则走 Selenium"""
+    for attempt in range(1, RETRY_TIMES + 1):
+        try:
+            logging.info("尝试[%d/%d] %s", attempt, RETRY_TIMES, url)
+            resp = requests.get(
+                url,
+                headers=_random_headers(),
+                timeout=TIMEOUT,
+            )
+            if resp.status_code == 200:
+                return resp.text
+            if resp.status_code in (403, 503, 520, 521, 522, 525):
+                raise RuntimeError("CF Shield")
+        except Exception as e:
+            logging.warning("requests 失败: %s", e)
+        _sleep()
+    return _selenium_get(url)
+
+# ---------- 主流程 ----------
 def crawl() -> Set[str]:
     ips = set()
     for u in URLS:
@@ -158,7 +167,7 @@ def save(ips: Set[str]):
         f.write("\n".join(sorted_ips) + "\n")
     logging.info("已保存 %d 条 IP 到 %s", len(sorted_ips), OUTPUT_FILE)
 
-# >>> 7. 入口 <<<
+# ---------- 入口 ----------
 if __name__ == "__main__":
     if os.path.exists(OUTPUT_FILE):
         os.remove(OUTPUT_FILE)
