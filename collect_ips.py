@@ -34,7 +34,7 @@ RANDOM_JITTER = (1, 3)
 
 URLS = [
     'https://ip.164746.xyz', 
-    'https://cf.090227.xyz', 
+    'https://cf.090227.xyz/CloudFlareYes', 
     'https://stock.hostmonit.com/CloudFlareYes',
     'https://ip.haogege.xyz/',
     'https://ct.090227.xyz',
