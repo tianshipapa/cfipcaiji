@@ -33,7 +33,7 @@ if os.path.exists('ip.txt'):
 # 使用集合存储IP地址实现自动去重
 unique_ips = set()
 
-for url in urls:
+for url in URLS:
     try:
         # 发送HTTP请求获取网页内容
         response = requests.get(url, timeout=5)
