@@ -8,6 +8,7 @@ URLS = [
     'https://ip.164746.xyz', 
     'https://cf.090227.xyz/CloudFlareYes', 
     'https://stock.hostmonit.com/CloudFlareYes',
+    'https://api.uouin.com/cloudflare.html',
     'https://ip.haogege.xyz/',
     'https://www.wetest.vip/page/edgeone/address_v4.html',
     'https://www.wetest.vip/page/cloudfront/address_v4.html',
