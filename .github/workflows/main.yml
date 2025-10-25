@@ -34,6 +34,11 @@ jobs:
     - name: Run script
       run: python ${{ github.workspace }}/collect_ips.py
         
+    - name: Get IP Info
+      env:
+        MAX_WORKERS: 20
+      run: python ${{ github.workspace }}/scripts/get_ip_info.py
+        
     - name: Commit and push changes
       run: |
         git config --local user.email "actions@github.com"
