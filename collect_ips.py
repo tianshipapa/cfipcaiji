@@ -5,16 +5,20 @@ import os
 
 # 目标URL列表
 URLS = [
-    'https://ip.164746.xyz', 
-    'https://cf.090227.xyz',
-    'https://cf.vvhan.com',
-    'https://cf.090227.xyz/CloudFlareYes', 
-    'https://stock.hostmonit.com/CloudFlareYes',
+    'https://addressesapi.090227.xyz/CloudFlareYes',
+    'https://addressesapi.090227.xyz/ip.164746.xyz',
     'https://api.uouin.com/cloudflare.html',
+    'https://cf.090227.xyz',
+    'https://cf.090227.xyz/CloudFlareYes',
+    'https://cf.vvhan.com',
+    'https://cmcc.090227.xyz',
+    'https://ct.090227.xyz',
+    'https://ip.164746.xyz',
     'https://ip.haogege.xyz/',
-    'https://www.wetest.vip/page/edgeone/address_v4.html',
+    'https://stock.hostmonit.com/CloudFlareYes',
+    'https://www.wetest.vip/page/cloudflare/address_v4.html',
     'https://www.wetest.vip/page/cloudfront/address_v4.html',
-    'https://www.wetest.vip/page/cloudflare/address_v4.html'
+    'https://www.wetest.vip/page/edgeone/address_v4.html'
 ]
 
 # 正则表达式用于匹配IP地址
