@@ -1,91 +1,90 @@
-13.35.11.236#SG,Singapore,Singapore
-43.159.108.90#SG,Singapore,Singapore
-43.159.107.53#SG,Singapore,Singapore
-43.174.245.105#CN,Guangdong,Shenzhen
-43.159.109.204#SG,Singapore,Singapore
-43.174.200.13#SG,Singapore,Singapore
-43.174.242.61#HK,Hong Kong,Hong Kong
-43.174.243.125#HK,Hong Kong,Hong Kong
-43.174.201.229#SG,Singapore,Singapore
-43.174.244.218#CN,Guangdong,Shenzhen
-43.174.242.122#HK,Hong Kong,Hong Kong
-13.227.21.189#US,California,San Francisco
-43.175.165.183#NL,North Holland,Amsterdam
-43.174.245.98#CN,Guangdong,Shenzhen
-43.174.198.186#SG,Singapore,Singapore
-13.249.144.39#JP,Osaka,Osaka
-43.159.107.92#SG,Singapore,Singapore
-65.8.72.77#US,Florida,Miami
-65.8.72.51#US,Florida,Miami
-43.175.213.251#HK,Hong Kong,Hong Kong
-65.8.158.224#US,California,San Jose
-65.8.158.15#US,California,San Jose
-104.16.65.1#US,California,San Francisco
+104.16.141.83#US,California,San Francisco
+43.174.196.71#SG,Singapore,Singapore
 104.16.105.166#US,California,San Francisco
+13.32.100.36#DE,Hesse,Mörfelden-Walldorf
+65.8.158.14#US,California,San Jose
+43.152.14.235#HK,Hong Kong,Hong Kong
+104.16.46.219#US,California,San Francisco
+43.174.244.248#CN,Guangdong,Shenzhen
+13.35.185.65#HK,Islands,Tung Chung
+65.8.158.82#US,California,San Jose
+43.174.245.36#CN,Guangdong,Shenzhen
+104.16.65.1#US,California,San Francisco
+43.175.120.21#HK,Hong Kong,Hong Kong
+43.175.162.90#DE,Hesse,Frankfurt am Main
+43.175.7.117#US,California,Los Angeles
+43.175.165.56#NL,North Holland,Amsterdam
+13.226.57.207#HK,Islands,Tung Chung
+52.84.212.138#FR,Provence-Alpes-Côte d'Azur,Marseille
+43.175.7.70#US,California,Los Angeles
+13.33.142.141#HK,Islands,Tung Chung
 104.17.69.244#US,California,San Francisco
-104.17.237.208#US,California,San Francisco
-104.16.141.155#US,California,San Francisco
-104.18.81.19#US,California,San Francisco
-104.18.166.129#US,California,San Francisco
-104.18.63.27#US,California,San Francisco
-104.18.189.153#US,California,San Francisco
-104.17.139.37#US,California,San Francisco
+104.17.79.221#US,California,San Francisco
+104.17.15.185#US,California,San Francisco
 104.17.162.3#US,California,San Francisco
-104.18.63.71#US,California,San Francisco
-104.18.190.194#US,California,San Francisco
-104.18.128.159#US,California,San Francisco
-104.17.167.134#US,California,San Francisco
+104.17.139.37#US,California,San Francisco
 104.17.142.212#US,California,San Francisco
-104.19.148.121#US,California,San Francisco
-104.18.151.172#US,California,San Francisco
-104.19.110.127#US,California,San Francisco
-104.18.255.167#US,California,San Francisco
+104.17.167.134#US,California,San Francisco
+104.17.171.235#US,California,San Francisco
+104.17.253.40#US,California,San Francisco
+104.18.158.25#US,California,San Francisco
 104.18.89.52#US,California,San Francisco
-104.19.24.192#US,California,San Francisco
-104.18.223.253#US,California,San Francisco
-104.18.205.96#US,California,San Francisco
+104.18.44.143#US,California,San Francisco
+104.18.15.220#US,California,San Francisco
+104.18.144.195#US,California,San Francisco
+104.19.148.121#US,California,San Francisco
+104.18.81.19#US,California,San Francisco
+104.19.190.94#US,California,San Francisco
+104.18.151.172#US,California,San Francisco
+104.19.13.227#US,California,San Francisco
+104.18.207.30#US,California,San Francisco
+104.18.255.167#US,California,San Francisco
 104.19.154.200#US,California,San Francisco
-104.19.212.207#US,California,San Francisco
-104.19.237.212#US,California,San Francisco
-104.19.255.131#US,California,San Francisco
-162.159.61.183#US,California,San Francisco
-104.31.16.158#US,California,San Francisco
-104.26.5.134#US,California,San Francisco
-162.159.58.65#US,California,San Francisco
-104.26.4.90#US,California,San Francisco
-143.204.25.127#US,Georgia,East Point
-108.138.0.81#DE,Hesse,Mörfelden-Walldorf
-162.159.128.253#US,California,San Francisco
-104.19.220.22#US,California,San Francisco
-162.159.137.204#US,California,San Francisco
-162.159.140.85#US,California,San Francisco
-104.24.254.73#US,California,San Francisco
-162.159.36.91#US,California,San Francisco
-162.159.46.107#US,California,San Francisco
-162.159.136.89#US,California,San Francisco
-162.159.24.131#US,California,San Francisco
+104.18.166.129#US,California,San Francisco
 104.26.3.162#US,California,San Francisco
-104.21.239.121#US,California,San Francisco
-162.159.0.129#US,California,San Francisco
+104.18.223.253#US,California,San Francisco
+104.19.220.22#US,California,San Francisco
+104.19.212.207#US,California,San Francisco
+108.138.0.104#DE,Hesse,Mörfelden-Walldorf
 104.26.8.117#US,California,San Francisco
-162.159.140.116#US,California,San Francisco
-172.64.52.127#US,California,San Francisco
+104.26.5.134#US,California,San Francisco
+104.18.189.153#US,California,San Francisco
+104.27.110.208#US,California,San Francisco
+104.31.16.158#US,California,San Francisco
+162.159.36.72#US,California,San Francisco
+108.138.100.195#US,Washington,Seattle
+162.159.24.131#US,California,San Francisco
+143.204.201.234#US,Virginia,Ashburn
+104.25.158.20#US,California,San Francisco
+162.159.58.65#US,California,San Francisco
+162.159.137.204#US,California,San Francisco
+104.26.4.90#US,California,San Francisco
+162.159.61.183#US,California,San Francisco
+162.159.0.129#US,California,San Francisco
 172.64.48.226#US,California,San Francisco
-162.159.255.54#US,California,San Francisco
-172.64.91.69#US,California,San Francisco
-162.159.195.30#US,California,San Francisco
-172.67.95.41#US,California,San Francisco
-172.64.229.7#US,California,San Francisco
-198.41.194.162#US,California,San Francisco
-172.67.105.128#US,California,San Francisco
-172.67.215.181#US,California,San Francisco
-198.41.208.202#US,California,San Francisco
-198.41.208.224#US,California,San Francisco
-190.93.246.137#CR,San José,Uruca
-173.245.49.194#US,California,San Francisco
-198.41.208.15#US,California,San Francisco
-172.67.223.236#US,California,San Francisco
-198.41.208.133#US,California,San Francisco
-198.41.208.119#US,California,San Francisco
+162.159.140.116#US,California,San Francisco
+162.159.140.85#US,California,San Francisco
+162.159.128.253#US,California,San Francisco
+162.159.133.184#US,California,San Francisco
+162.159.136.89#US,California,San Francisco
+162.159.239.44#US,California,San Francisco
 172.64.82.114#US,California,San Francisco
-216.137.39.239#US,California,El Segundo
+172.64.52.127#US,California,San Francisco
+172.64.91.69#US,California,San Francisco
+172.64.229.7#US,California,San Francisco
+172.64.88.69#US,California,San Francisco
+172.64.158.24#US,California,San Francisco
+172.67.144.239#US,California,San Francisco
+172.67.83.30#US,California,San Francisco
+172.67.175.115#US,California,San Francisco
+172.67.210.138#US,California,San Francisco
+190.93.245.178#CR,San José,Uruca
+173.245.49.194#US,California,San Francisco
+172.67.239.125#US,California,San Francisco
+198.41.194.162#US,California,San Francisco
+198.41.209.120#US,California,San Francisco
+198.41.208.15#US,California,San Francisco
+198.41.208.133#US,California,San Francisco
+198.41.208.112#US,California,San Francisco
+198.41.209.186#US,California,San Francisco
+198.41.208.224#US,California,San Francisco
